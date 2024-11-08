@@ -19,9 +19,9 @@ def login():
             encryptedPassword = i['password']
             id = i["id"]
 
-
-        if encryptedPassword != None:
-            decryptedPassword = decryption(encryptedPassword).decode()
+         # Decrypt the stored password for comparison
+        if encryptedPassword is not None:
+            decryptedPassword = decryption(encryptedPassword)
 
         if len(searchUser) != 1 or password != decryptedPassword:
             flash("Email or Password incorrect.", "error")

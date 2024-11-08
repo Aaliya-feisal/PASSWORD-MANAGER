@@ -1,9 +1,11 @@
 from flask import Flask, render_template
 from cs50 import SQL
 from flask_session import Session
+import logging
 
 from datetime import timedelta
 
+logging.basicConfig(level=logging.INFO)
 
 db = SQL('sqlite:///database.db')
 
@@ -42,4 +44,5 @@ def create_app():
 
 
 if __name__ == '__main__':
-    create_app().run()
+    app =create_app()
+    app.run(debug=True)

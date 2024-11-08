@@ -1,62 +1,163 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-    {% for username in informationCurrentUser %}
-        Update User: {{ username["username"] }} 
-    {% endfor %}
+    Vault
 {% endblock %}
 
 {% block body %}
-    <main class='container-fluid py-5'>
-        <div class="container">
-            <form method="POST">
-                <div class="hstack gap-3">
-                    {% for username in informationCurrentUser %}
-                        <div><h1 style="font-size: 45px;">Update User</h1></div>
-                    {% endfor %}
-                    <div class="ms-auto">
-                        <a href="{{ url_for('views.account') }}" class="btn btn-danger btn-lg">
-                            <span class="material-icons" style="line-height: unset;">
-                                clear
-                            </span>
-                        </a>
-                    </div>
-                    <div>
-                        <button type="submit" class="btn btn-success btn-lg">
-                            <span class="material-icons" style="line-height: unset;">
-                                done
-                            </span>
-                        </button>
-                    </div>
-                </div>
-                
-                <hr>
+<main class='container-fluid py-5'>
+    <div class="container">
 
-                {% for data in informationCurrentUser %}
-                    <div class="mb-3" id="inputs">
-                        <label class="form-label">Email</label>
-                        <div class="form-floating">
-                            <input type="email" class="form-control" id="email-profile" name="email" placeholder="Enter an email" value="{{ data['email'] }}">
-                            <label for="email" class="text-secondary">{{ data["email"] }}</label>
-                        </div>
-                    </div>
-                    <div class="mb-3" id="inputs">
-                        <label class="form-label">Password</label>
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="password" name="password" placeholder="Enter an password" value="{{ decryptedPassword }}">
-                            <label for="password" class="text-secondary">{{ decryptedPassword }}</label>
-                        </div>
-                        <span class="form-text">Must be greater than 8 characters long.</span>
-                    </div>
-                    <div class="mb-3" id="inputs">
-                        <label class="form-label">Confirm Password</label>
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="confirm" name="confirm" placeholder="Confirm the password" value="{{ decryptedPassword }}" required>
-                            <label for="confirm" class="text-secondary">{{ decryptedPassword }}</label>
-                        </div>
+        <!-- Alert Section for Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Vault Content -->
+        <div class="hstack gap-3">
+            <div><h1 style="font-size: 45px;">Passwords</h1></div>
+            <div class="ms-auto">
+                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                    <span class="material-icons" style="line-height: unset;" id="icon_password">add</span>
+                </button>
+            </div>
+        </div>
+
+        <hr>
+        <span id="index-phrase" class="form-text">Passwords will be saved in chronological order, from the most recent to the oldest</span>
+        
+        <table class="table table-hover table-bordered border" id="table-passwords">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for secret in passwords %}
+                    <tr>
+                        <th scope="row">{{ secret["name"] }}</th>
+                        <td>{{ secret["email"] }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a class="btn btn-primary" href="{{ url_for('views.secret', id=secret['id']) }}">Open</a>
+                                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" id="updateButton" href="{{ url_for('views.update', id=secret['id']) }}">Modify</a></li>
+                                    <li><button class="dropdown-item" id="deleteButton" value="{{ secret['id'] }}" onclick="deleteItem(this.value);">Delete</button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Modal Add Item-->
+<div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addItemModalLabel">Add Item</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('views.add') }}" method="POST">
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter a name">
+                        <label for="name">Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="add-username" name="add-username" placeholder="Enter a username">
+                        <label for="add-username">Username</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="email" name="email" placeholder="Enter an email" onblur="checkEmailBreach(this.value)">
+                        <label for="email">Email</label>
+                        <div id="email-breach-warning" class="form-text text-danger d-none">
+                            This email has been found in a breach. <a href="#" onclick="showEmailBreachInfo()">Learn More</a>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="add-password" name="add-password" placeholder="Enter a password" oninput="checkPasswordStrength(this.value)">
+                        <label for="add-password">Password</label>
+                        <div class="form-text">Include at least one number, a capital letter, and a special character.</div>
+                        <div id="password-strength-feedback" class="form-text"></div>
+                        <div id="password-breach-warning" class="form-text text-danger d-none">
+                            This password has been compromised. <a href="#" onclick="showPasswordBreachInfo()">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
             </form>
         </div>
-    </main>
+    </div>
+</div>
+
+<!-- Include zxcvbn library for password strength checking -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+<script>
+    function checkEmailBreach(email) {
+        fetch(`/check-email-breach?email=${email}`)
+            .then(response => response.json())
+            .then(data => {
+                const warning = document.getElementById("email-breach-warning");
+                if (data.breached) {
+                    warning.classList.remove("d-none");
+                } else {
+                    warning.classList.add("d-none");
+                }
+            });
+    }
+
+    function checkPasswordStrength(password) {
+        const result = zxcvbn(password);
+        const strengthFeedback = document.getElementById("password-strength-feedback");
+        const breachWarning = document.getElementById("password-breach-warning");
+        strengthFeedback.innerText = `Strength: ${result.score}/4 - ${result.feedback.suggestions.join(', ')}`;
+        strengthFeedback.style.color = result.score >= 3 ? 'green' : 'red';
+
+        fetch(`/check-password-breach?password=${password}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.breached) {
+                    breachWarning.classList.remove("d-none");
+                } else {
+                    breachWarning.classList.add("d-none");
+                }
+            });
+    }
+
+    function showEmailBreachInfo() {
+        alert("A breached email means that it has been found in a compromised dataset. Consider using a different email for added security.");
+    }
+
+    function showPasswordBreachInfo() {
+        alert("A breached password has been compromised in a data leak. Consider generating a strong, unique password.");
+    }
+
+    function generatePassword() {
+        const passwordField = document.getElementById("add-password");
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        const generatedPassword = Array.from({ length: 12 }, () => characters.charAt(Math.floor(Math.random() * characters.length))).join('');
+        
+        passwordField.value = generatedPassword;
+        checkPasswordStrength(generatedPassword);
+    }
+</script>
 {% endblock %}

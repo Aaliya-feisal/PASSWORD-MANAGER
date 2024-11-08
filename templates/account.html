@@ -107,5 +107,39 @@
             </script>
                 
         </div>
+         <!-- Breach Information Modal -->
+         <div class="modal fade" id="breachInfoModal" tabindex="-1" aria-labelledby="breachInfoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="breachInfoModalLabel">What Does a Data Breach Mean?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Your email/password has been found in a data breach. This means that the information may have been exposed publicly, putting your account at risk.</p>
+                        <p><strong>Recommended Actions:</strong></p>
+                        <ul>
+                            <li>Update your password to a unique, strong one that you haven't used before.</li>
+                            <li>Enable two-factor authentication on accounts for added security.</li>
+                            <li>Use a password manager to ensure strong, unique passwords across your accounts.</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if breach_alert %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var breachModal = new bootstrap.Modal(document.getElementById('breachInfoModal'));
+                breachModal.show();
+            });
+        </script>
+        {% endif %}
+
+    </div>
     </main>
 {% endblock %}

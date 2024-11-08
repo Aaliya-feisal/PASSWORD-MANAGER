@@ -8,7 +8,9 @@
 <main class='container-fluid py-5'>
     <div class='container'>
 
-        <h1 id='title' class='unselectable text-center'>Axiom</h1>
+        <h1 id="title" class="unselectable text-center">VaultGuard</h1>
+        <h2 id="caption" class="text-center">Securing Your Digital Keys</h2>
+
 
         <form action='{{ url_for("auth.login") }}' method='POST' id='login-form'>
 
@@ -83,5 +85,38 @@
         </div>
     </div>
 </div>
+<style>
+    #title {
+        font-size: 3em;
+        font-weight: 700;
+        color: #333;
+        text-align: center;
+        margin-bottom: 1px; /* Reduced space below title */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Subtle shadow for emphasis */
+    }
+    
+    #caption {
+        font-size: 1.25em;
+        font-weight: 400;
+        color: #666; /* Lighter color for differentiation */
+        text-align: center;
+        margin-bottom: 20px; /* Increased space below caption */
+    }
+    
+    /* Typing animation without the cursor effect */
+    @keyframes typing {
+        from { width: 80%; }
+        to { width: 100%; }
+    }
+    
+    #caption {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        animation: typing 2.5s ease-out forwards; /* Increased duration and smoother easing */
+        border-right: none; /* Removes cursor effect */
+    }
+    
+</style>
 
 {% endblock %}
