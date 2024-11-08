@@ -1,3 +1,15 @@
 flask_session/
 FlaskCheatSheets.png
 Thinking.txt
+__pycache__/
+*.pyc
+.env
+.DS_Store
+.vscode/
+*.sqlite3
+*.db
+# Flask session files
+flask_session/
+
+# Virtual environment
+venv/
