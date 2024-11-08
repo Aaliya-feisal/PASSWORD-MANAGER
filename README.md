@@ -1,12 +1,7 @@
-# Axiom
+# VaultGuard
 
-Axiom is a web-based password manager written in Flask. It allows you to easily and securely save your passwords. Every password saved on the site is encrypted and only accessible to you.
+VaultGuard is a web-based password manager written in Flask. It allows you to easily and securely save your passwords. Every password saved on the site is encrypted and only accessible to you.
 
-This project was developed as the Final Project for the CS50x Course.
-
-## Demo
-
-You can watch a video demo of the project [here](https://youtu.be/Z8jpD8sJ0tk).
 
 ## Project Structure
 
@@ -16,7 +11,7 @@ Explanation of each file:
 
 2. **helper.py**: This file contains helper functions used throughout the project:
    - `login_required`: This function prevents unauthorized access to specific pages by requiring users to log in.
-   - `encryption`: This function uses the [Cryptography](https://pypi.org/project/cryptography/) library to encrypt messages passed as parameters.
+   - `encryption`: Use AES-256 encryption to securely store and retrieve sensitive information.
    - `decryption`: This function decrypts messages using the same encryption procedure.
 
 3. **auth.py**: This file contains functions related to user authentication:
